@@ -82,6 +82,8 @@ When explaining this project in interviews, you can say:
 I separated the UI from the model for maintainability, implemented persistence so tasks survive between sessions, and included features like task creation, editing, deletion, and partial drag-and-drop. Future improvements include full drag-and-drop, dark mode, and advanced persistence.”
 
 ## 📂 File Structure (Overview)
+
+```
 EasyKanban/
 ├─ src/
 │  ├─ com/company/Main.java
@@ -90,6 +92,7 @@ EasyKanban/
 │  └─ com/company/model/Task.java
 ├─ tasks.dat          # Auto-generated persistence file
 └─ README.md
+```
 ⚠️ Notes
 tasks.dat is a binary file and is automatically created at runtime after adding tasks.
 
