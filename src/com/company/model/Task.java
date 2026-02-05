@@ -1,17 +1,19 @@
 package com.company.model;
 
+import java.io.Serializable;
+
 /**
- * Represent ONE task card on a Kanban board
+ * Represents ONE task card on a Kanban board
  */
-public class Task {
+public class Task implements Serializable {
 
     // --- Fields (data the task holds) ---
-    private String name;           // Task title
-    private String description;    // Short explanation of the task
-    private String developer;      // Person responsible
-    private int duration;          // Estimated hours
-    private String status;         // To Do / Doing / Done
-    private String taskId;         // Auto-generated ID
+    private String name;          // Task title
+    private String description;   // Short explanation of the task
+    private String developer;     // Person responsible
+    private int duration;         // Estimated hours
+    private String status;        // To Do / Doing / Done
+    private String taskId;        // Auto-generated ID
 
     /**
      * Constructor runs when a Task is created
@@ -22,7 +24,7 @@ public class Task {
         this.developer = developer;
         this.duration = duration;
         this.status = status;
-        this.taskId = generateTaskId(); // auto-generated ID
+        this.taskId = generateTaskId(); // auto-generate ID
     }
 
     /**
@@ -35,7 +37,19 @@ public class Task {
                 developer.split(" ")[0].toUpperCase();
     }
 
-    // -- Getters (controlled access to data) ---
+    // --- Getters (controlled access to data) ---
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getDeveloper() {
+        return developer;
+    }
 
     public int getDuration() {
         return duration;
@@ -45,16 +59,39 @@ public class Task {
         return status;
     }
 
+    // Add these methods inside Task.java
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDeveloper(String developer) {
+        this.developer = developer;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     /**
      * Used when displaying task details in the UI
      */
-     @Override
+    @Override
     public String toString() {
-         return "Task ID: " + taskId +
-                 "\nName: " + name +
-                 "\nDescription: " + description +
-                 "\nDeveloper: " + developer +
-                 "\nDuration: " + duration + " hrs" +
-                 "\nStatus: " + status;
-     }
+        return "Task ID: " + taskId +
+                "\nName: " + name +
+                "\nDescription: " + description +
+                "\nDeveloper: " + developer +
+                "\nDuration: " + duration + " hrs" +
+                "\nStatus: " + status;
+    }
+
 }

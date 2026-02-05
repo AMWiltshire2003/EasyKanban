@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class KanbanFrame extends JFrame {
 
-    private ArrayList<Task> tasks = new ArrayList<>();
+    private ArrayList<Task> tasks;
 
     // Panels for each column
     private JPanel todoPanel = createColumn("TO DO", new Color(230, 240, 255));
@@ -42,6 +42,13 @@ public class KanbanFrame extends JFrame {
 
         add(topBar, BorderLayout.NORTH);
         add(board, BorderLayout.CENTER);
+
+        tasks = TaskService.loadTasks();
+        loadTasksIntoBoard();
+
+        enableDrop(todoPanel, "To Do");
+        enableDrop(doingPanel, "Doing");
+        enableDrop(donePanel, "Done");
     }
 
     /**
@@ -89,14 +96,26 @@ public class KanbanFrame extends JFrame {
                 JOptionPane.showInputDialog("Duration (hours):")
         );
 
-        String status = JOptionPane.showInputDialog(
-                "Status (To Do / Doing / Done)");
+        String[] statuses = {"To Do", "Doing", "Done"};
+        JComboBox<String> statusDropdown = new JComboBox<>(statuses);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                statusDropdown,
+                "Select Task Status",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (result != JOptionPane.OK_OPTION) return;
+
+        String status = (String) statusDropdown.getSelectedItem();
+
 
         Task task = new Task(name, description, developer, duration, status);
         tasks.add(task);
 
         // Create a visual card
-        JPanel taskCard = createTaskCard(task);
+        TaskCardPanel taskCard = new TaskCardPanel(task);
 
         // Add card to correct column
         switch (status.toLowerCase()) {
@@ -114,6 +133,8 @@ public class KanbanFrame extends JFrame {
         // Refresh UI
         revalidate();
         repaint();
+
+        TaskService.saveTasks(tasks);
     }
 
     /**
@@ -135,5 +156,86 @@ public class KanbanFrame extends JFrame {
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
 
         return card;
+    }
+
+    /**
+     * Restores saved tasks into the correct columns
+     */
+    private void loadTasksIntoBoard() {
+
+        for (Task task : tasks) {
+
+            TaskCardPanel card = new TaskCardPanel(task);
+
+            switch (task.getStatus().toLowerCase()) {
+                case "to do":
+                    todoPanel.add(card);
+                    break;
+                case "doing":
+                    doingPanel.add(card);
+                    break;
+                case "done":
+                    donePanel.add(card);
+                    break;
+            }
+        }
+
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Enables drag-and-drop for a column
+     */
+    private void enableDrop(JPanel column, String newStatus) {
+
+        column.setTransferHandler(new TransferHandler() {
+
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return support.isDataFlavorSupported(
+                        TaskCardPanel.TaskTransferable.TASK_FLAVOR);
+            }
+
+            @Override
+            public boolean importData(TransferSupport support) {
+
+                try {
+                    Task task = (Task) support.getTransferable()
+                            .getTransferData(
+                                    TaskCardPanel.TaskTransferable.TASK_FLAVOR);
+
+                    TaskCardPanel card = new TaskCardPanel(task);
+
+                    // Remove from old parent
+                    Container oldParent = card.getParent();
+                    if (oldParent != null) {
+                        oldParent.remove(card);
+                    }
+
+                    // Update task status
+                    task.setStatus(newStatus);
+
+                    // Add to new column
+                    column.add(card);
+
+                    // Save change
+                    TaskService.saveTasks(tasks);
+
+                    revalidate();
+                    repaint();
+
+                    return true;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+        });
+    }
+
+    public Object getTasks() {
+        return getTasks();
     }
 }
